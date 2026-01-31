@@ -1,0 +1,36 @@
+{
+  "name": "overpork",
+  "version": "0.1.0",
+  "description": "CLI wrapper for Porkbun API, optimized for agentic use",
+  "bin": {
+    "overpork": "bin/overpork"
+  },
+  "scripts": {
+    "postinstall": "node scripts/postinstall.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OverseedAI/overpork.git"
+  },
+  "keywords": [
+    "porkbun",
+    "dns",
+    "domain",
+    "cli"
+  ],
+  "author": "OverseedAI",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/OverseedAI/overpork/issues"
+  },
+  "homepage": "https://github.com/OverseedAI/overpork#readme",
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ]
+}
