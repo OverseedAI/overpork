@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/OverseedAI/overpork/internal/api"
 	"github.com/OverseedAI/overpork/internal/output"
 	"github.com/spf13/cobra"
@@ -198,6 +200,81 @@ var domainForwardDeleteCmd = &cobra.Command{
 	},
 }
 
+var domainRegisterCmd = &cobra.Command{
+	Use:   "register <domain>",
+	Short: "Register a new domain",
+	Long: `Register a new domain.
+
+Examples:
+  overpork domain register example.com
+  overpork domain register example.com --years 2
+  overpork domain register example.com --ns ns1.example.com --ns ns2.example.com`,
+	Args: cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		domain := args[0]
+
+		years, _ := cmd.Flags().GetInt("years")
+		coupon, _ := cmd.Flags().GetString("coupon")
+		nameservers, _ := cmd.Flags().GetStringSlice("ns")
+		privacy, _ := cmd.Flags().GetBool("privacy")
+		autoRenew, _ := cmd.Flags().GetBool("auto-renew")
+
+		opts := api.DomainCreateOpts{
+			Years:        years,
+			Coupon:       coupon,
+			Nameservers:  nameservers,
+			WhoisPrivacy: privacy,
+			AutoRenew:    autoRenew,
+		}
+
+		if err := apiClient.DomainRegister(domain, opts); err != nil {
+			return err
+		}
+
+		if output.JSONOutput {
+			output.PrintJSON(map[string]string{"domain": domain, "status": "registered"})
+		} else {
+			output.Success("Registered %s", domain)
+		}
+		return nil
+	},
+}
+
+var domainAutoRenewCmd = &cobra.Command{
+	Use:   "auto-renew <domain> <enable|disable>",
+	Short: "Enable or disable auto-renewal",
+	Args:  cobra.ExactArgs(2),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		domain := args[0]
+		action := args[1]
+
+		var enabled bool
+		switch action {
+		case "enable", "on", "yes", "true":
+			enabled = true
+		case "disable", "off", "no", "false":
+			enabled = false
+		default:
+			return fmt.Errorf("invalid action: use 'enable' or 'disable'")
+		}
+
+		if err := apiClient.DomainSetAutoRenew(domain, enabled); err != nil {
+			return err
+		}
+
+		if output.JSONOutput {
+			output.PrintJSON(map[string]any{"domain": domain, "autoRenew": enabled})
+		} else {
+			if enabled {
+				output.Success("Auto-renewal enabled for %s", domain)
+			} else {
+				output.Success("Auto-renewal disabled for %s", domain)
+			}
+		}
+		return nil
+	},
+}
+
 func init() {
 	rootCmd.AddCommand(domainCmd)
 
@@ -216,4 +293,13 @@ func init() {
 	domainForwardAddCmd.Flags().StringP("subdomain", "s", "", "Subdomain to forward")
 
 	domainCmd.AddCommand(domainForwardDeleteCmd)
+
+	domainCmd.AddCommand(domainRegisterCmd)
+	domainRegisterCmd.Flags().Int("years", 1, "Registration period in years")
+	domainRegisterCmd.Flags().String("coupon", "", "Coupon code")
+	domainRegisterCmd.Flags().StringSlice("ns", nil, "Nameservers (can specify multiple)")
+	domainRegisterCmd.Flags().Bool("privacy", true, "Enable WHOIS privacy")
+	domainRegisterCmd.Flags().Bool("auto-renew", true, "Enable auto-renewal")
+
+	domainCmd.AddCommand(domainAutoRenewCmd)
 }
