@@ -27,11 +27,6 @@ func NewClient(cfg *config.Config) *Client {
 	}
 }
 
-type authRequest struct {
-	APIKey       string `json:"apikey"`
-	SecretAPIKey string `json:"secretapikey"`
-}
-
 type Response struct {
 	Status  string `json:"status"`
 	Message string `json:"message,omitempty"`

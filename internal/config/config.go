@@ -16,8 +16,8 @@ type Config struct {
 func Load() (*Config, error) {
 	// Env vars take precedence
 	viper.SetEnvPrefix("PORKBUN")
-	viper.BindEnv("api_key")
-	viper.BindEnv("secret_key")
+	_ = viper.BindEnv("api_key")
+	_ = viper.BindEnv("secret_key")
 
 	// XDG config
 	configDir, err := os.UserConfigDir()

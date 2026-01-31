@@ -18,7 +18,7 @@ func Print(v any) {
 	if JSONOutput {
 		enc := json.NewEncoder(Stdout)
 		enc.SetIndent("", "  ")
-		enc.Encode(v)
+		_ = enc.Encode(v)
 		return
 	}
 	fmt.Fprintln(Stdout, v)
@@ -27,7 +27,7 @@ func Print(v any) {
 func PrintJSON(v any) {
 	enc := json.NewEncoder(Stdout)
 	enc.SetIndent("", "  ")
-	enc.Encode(v)
+	_ = enc.Encode(v)
 }
 
 func PrintTable(headers []string, rows [][]string) {

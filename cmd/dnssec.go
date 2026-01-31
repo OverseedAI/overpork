@@ -114,10 +114,10 @@ func init() {
 	dnssecCreateCmd.Flags().String("digest", "", "Digest value (required)")
 	dnssecCreateCmd.Flags().String("public-key", "", "Public key (optional)")
 	dnssecCreateCmd.Flags().String("flags", "", "Flags (optional)")
-	dnssecCreateCmd.MarkFlagRequired("keytag")
-	dnssecCreateCmd.MarkFlagRequired("algorithm")
-	dnssecCreateCmd.MarkFlagRequired("digest-type")
-	dnssecCreateCmd.MarkFlagRequired("digest")
+	_ = dnssecCreateCmd.MarkFlagRequired("keytag")
+	_ = dnssecCreateCmd.MarkFlagRequired("algorithm")
+	_ = dnssecCreateCmd.MarkFlagRequired("digest-type")
+	_ = dnssecCreateCmd.MarkFlagRequired("digest")
 
 	dnssecCmd.AddCommand(dnssecDeleteCmd)
 }

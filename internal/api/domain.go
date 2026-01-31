@@ -20,8 +20,17 @@ type domainListResponse struct {
 }
 
 type domainGetResponse struct {
-	Response
-	Domain
+	Status       string `json:"status"`
+	Message      string `json:"message,omitempty"`
+	Domain       string `json:"domain"`
+	DomainStatus string `json:"domainStatus"`
+	TLD          string `json:"tld"`
+	CreateDate   string `json:"createDate"`
+	ExpireDate   string `json:"expireDate"`
+	SecurityLock string `json:"securityLock"`
+	WhoisPrivacy string `json:"whoisPrivacy"`
+	AutoRenew    string `json:"autoRenew"`
+	NotLocal     int    `json:"notLocal"`
 }
 
 func (c *Client) DomainList(start int) ([]Domain, error) {
@@ -44,7 +53,17 @@ func (c *Client) DomainGet(domain string) (*Domain, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &resp.Domain, nil
+	return &Domain{
+		Domain:       resp.Domain,
+		Status:       resp.DomainStatus,
+		TLD:          resp.TLD,
+		CreateDate:   resp.CreateDate,
+		ExpireDate:   resp.ExpireDate,
+		SecurityLock: resp.SecurityLock,
+		WhoisPrivacy: resp.WhoisPrivacy,
+		AutoRenew:    resp.AutoRenew,
+		NotLocal:     resp.NotLocal,
+	}, nil
 }
 
 func (c *Client) DomainUpdateNameservers(domain string, nameservers []string) error {

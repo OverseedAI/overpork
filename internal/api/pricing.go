@@ -42,7 +42,7 @@ func (c *Client) DomainCheck(domain string) (bool, float64, error) {
 	var price float64
 	if resp.Price != "" {
 		// Price is a string, parse it
-		fmt.Sscanf(resp.Price, "%f", &price)
+		_, _ = fmt.Sscanf(resp.Price, "%f", &price)
 	}
 	return available, price, nil
 }
