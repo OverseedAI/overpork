@@ -1,5 +1,5 @@
 # Binaries
-overpork
+opork
 *.exe
 dist/
 bin/

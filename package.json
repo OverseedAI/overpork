@@ -1,9 +1,9 @@
 {
-  "name": "overpork",
+  "name": "opork",
   "version": "0.1.0",
   "description": "CLI wrapper for Porkbun API, optimized for agentic use",
   "bin": {
-    "overpork": "bin/overpork"
+    "opork": "bin/opork"
   },
   "scripts": {
     "postinstall": "node scripts/postinstall.js"

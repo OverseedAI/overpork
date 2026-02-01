@@ -28,17 +28,17 @@ if (!platform || !arch) {
 }
 
 const ext = platform === 'windows' ? '.exe' : '';
-const binaryName = `overpork-${platform}-${arch}${ext}`;
+const binaryName = `opork-${platform}-${arch}${ext}`;
 const downloadUrl = `https://github.com/OverseedAI/overpork/releases/download/v${version}/${binaryName}`;
 
 const binDir = path.join(__dirname, '..', 'bin');
-const binPath = path.join(binDir, `overpork${ext}`);
+const binPath = path.join(binDir, `opork${ext}`);
 
 if (!fs.existsSync(binDir)) {
   fs.mkdirSync(binDir, { recursive: true });
 }
 
-console.log(`Downloading overpork v${version} for ${platform}-${arch}...`);
+console.log(`Downloading opork v${version} for ${platform}-${arch}...`);
 
 const file = fs.createWriteStream(binPath);
 
@@ -59,7 +59,7 @@ function download(url) {
     file.on('finish', () => {
       file.close();
       fs.chmodSync(binPath, 0o755);
-      console.log('overpork installed successfully!');
+      console.log('opork installed successfully!');
     });
   }).on('error', (err) => {
     fs.unlink(binPath, () => {});

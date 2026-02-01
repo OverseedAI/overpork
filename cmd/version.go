@@ -14,7 +14,7 @@ var versionCmd = &cobra.Command{
 		if output.JSONOutput {
 			output.PrintJSON(map[string]string{"version": Version})
 		} else {
-			output.Print("overpork " + Version)
+			output.Print("opork " + Version)
 		}
 	},
 }

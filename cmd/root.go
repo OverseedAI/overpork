@@ -15,9 +15,9 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "overpork",
+	Use:   "opork",
 	Short: "CLI wrapper for Porkbun API",
-	Long:  "overpork is a CLI tool for managing domains, DNS records, and SSL certificates via the Porkbun API.",
+	Long:  "opork is a CLI tool for managing domains, DNS records, and SSL certificates via the Porkbun API.",
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		// Skip auth for commands that don't need it
 		if cmd.Name() == "help" || cmd.Name() == "version" || cmd.Name() == "completion" {

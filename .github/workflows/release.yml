@@ -46,14 +46,14 @@ jobs:
           if [ "$GOOS" = "windows" ]; then
             EXT=".exe"
           fi
-          OUTPUT="overpork-${GOOS}-${GOARCH}${EXT}"
+          OUTPUT="opork-${GOOS}-${GOARCH}${EXT}"
           go build -ldflags="-s -w -X github.com/OverseedAI/overpork/cmd.Version=${{ steps.version.outputs.VERSION }}" -o "$OUTPUT"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: overpork-${{ matrix.goos }}-${{ matrix.goarch }}
-          path: overpork-*
+          name: opork-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: opork-*
 
   release:
     needs: build
