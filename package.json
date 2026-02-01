@@ -24,6 +24,10 @@
     "url": "https://github.com/OverseedAI/overpork/issues"
   },
   "homepage": "https://github.com/OverseedAI/overpork#readme",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "os": [
     "darwin",
     "linux",
