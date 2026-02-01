@@ -123,6 +123,38 @@ opork pricing check example.com --json
 - `0` - Success
 - `1` - Error (message printed to stderr)
 
+## Development
+
+### Local Build
+
+```bash
+make build      # Build binary
+make test       # Run tests
+make lint       # Run linter
+make dist       # Build for all platforms
+```
+
+### Releasing
+
+Releases are automated via GitHub Actions. To publish a new version:
+
+1. Bump the version in `package.json`:
+   ```bash
+   npm version patch   # 0.1.0 -> 0.1.1
+   npm version minor   # 0.1.0 -> 0.2.0
+   npm version major   # 0.1.0 -> 1.0.0
+   ```
+
+2. Push to main:
+   ```bash
+   git push
+   ```
+
+The workflow will automatically:
+- Build binaries for all platforms (darwin/linux/windows, amd64/arm64)
+- Create a GitHub release with the binaries
+- Publish to npm
+
 ## License
 
 MIT
