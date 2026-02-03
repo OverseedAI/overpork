@@ -23,8 +23,11 @@ var rootCmd = &cobra.Command{
 		if cmd.Name() == "help" || cmd.Name() == "version" || cmd.Name() == "completion" {
 			return nil
 		}
-		if cmd.Parent() != nil && cmd.Parent().Name() == "overpork" && cmd.Name() == "config" {
-			return nil
+		// Skip auth for config commands
+		for c := cmd; c != nil; c = c.Parent() {
+			if c.Name() == "config" {
+				return nil
+			}
 		}
 
 		var err error
