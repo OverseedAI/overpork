@@ -43,29 +43,33 @@ console.log(`Downloading opork v${version} for ${platform}-${arch}...`);
 const file = fs.createWriteStream(binPath);
 
 function download(url) {
-  https.get(url, (response) => {
-    if (response.statusCode === 302 || response.statusCode === 301) {
-      download(response.headers.location);
-      return;
-    }
+  return new Promise((resolve, reject) => {
+    https.get(url, (response) => {
+      if (response.statusCode === 302 || response.statusCode === 301) {
+        download(response.headers.location).then(resolve).catch(reject);
+        return;
+      }
 
-    if (response.statusCode !== 200) {
-      console.error(`Failed to download: HTTP ${response.statusCode}`);
-      console.error(`URL: ${url}`);
-      process.exit(1);
-    }
+      if (response.statusCode !== 200) {
+        reject(new Error(`Failed to download: HTTP ${response.statusCode} from ${url}`));
+        return;
+      }
 
-    response.pipe(file);
-    file.on('finish', () => {
-      file.close();
-      fs.chmodSync(binPath, 0o755);
-      console.log('opork installed successfully!');
+      response.pipe(file);
+      file.on('finish', () => {
+        file.close();
+        fs.chmodSync(binPath, 0o755);
+        console.log('opork installed successfully!');
+        resolve();
+      });
+    }).on('error', (err) => {
+      fs.unlink(binPath, () => {});
+      reject(err);
     });
-  }).on('error', (err) => {
-    fs.unlink(binPath, () => {});
-    console.error(`Download failed: ${err.message}`);
-    process.exit(1);
   });
 }
 
-download(downloadUrl);
+download(downloadUrl).catch((err) => {
+  console.error(`Download failed: ${err.message}`);
+  process.exit(1);
+});
