@@ -33,7 +33,7 @@ func (c *Client) DomainCheck(domain string) (bool, float64, error) {
 		Price     string `json:"price"`
 	}
 	// Auth not required for availability check
-	err := c.post("/domain/check/"+domain, map[string]string{}, &resp)
+	err := c.post("/domain/checkDomain/"+domain, map[string]string{}, &resp)
 	if err != nil {
 		return false, 0, err
 	}
