@@ -59,7 +59,24 @@ function download(url) {
       file.on('finish', () => {
         file.close();
         fs.chmodSync(binPath, 0o755);
-        console.log('opork installed successfully!');
+
+        // Create symlink in npm bin directory since npm processes bin entries before postinstall runs
+        const npmBin = process.env.npm_config_prefix
+          ? path.join(process.env.npm_config_prefix, 'bin')
+          : path.dirname(process.execPath);
+        const symlinkPath = path.join(npmBin, `opork${ext}`);
+
+        try {
+          if (fs.existsSync(symlinkPath)) {
+            fs.unlinkSync(symlinkPath);
+          }
+          fs.symlinkSync(binPath, symlinkPath);
+          console.log('opork installed successfully!');
+        } catch (symlinkErr) {
+          // Symlink creation may fail due to permissions, but binary is still usable
+          console.log('opork binary installed. You may need to add it to your PATH manually.');
+          console.log(`Binary location: ${binPath}`);
+        }
         resolve();
       });
     }).on('error', (err) => {
