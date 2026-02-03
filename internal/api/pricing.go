@@ -2,11 +2,13 @@ package api
 
 import "fmt"
 
+const PricingURL = "https://porkbun.com/api/json/v3"
+
 type Pricing struct {
 	Registration    string `json:"registration"`
 	Renewal         string `json:"renewal"`
 	Transfer        string `json:"transfer"`
-	Coupons         bool   `json:"coupons"`
+	Coupons         any    `json:"coupons"`
 	SpecialType     string `json:"specialType,omitempty"`
 	SpecialDiscount string `json:"specialDiscount,omitempty"`
 }
@@ -18,8 +20,8 @@ type pricingResponse struct {
 
 func (c *Client) PricingList() (map[string]Pricing, error) {
 	var resp pricingResponse
-	// Pricing endpoint doesn't require auth
-	err := c.post("/pricing/get", map[string]string{}, &resp)
+	// Pricing endpoint uses porkbun.com (not api.porkbun.com)
+	err := c.postURL(PricingURL+"/pricing/get", map[string]string{}, &resp)
 	if err != nil {
 		return nil, err
 	}

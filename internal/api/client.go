@@ -33,8 +33,10 @@ type Response struct {
 }
 
 func (c *Client) do(method, endpoint string, reqBody, respBody any) error {
-	url := BaseURL + endpoint
+	return c.doURL(method, BaseURL+endpoint, reqBody, respBody)
+}
 
+func (c *Client) doURL(method, url string, reqBody, respBody any) error {
 	var body io.Reader
 	if reqBody != nil {
 		data, err := json.Marshal(reqBody)
@@ -79,7 +81,11 @@ func (c *Client) do(method, endpoint string, reqBody, respBody any) error {
 }
 
 func (c *Client) post(endpoint string, reqBody, respBody any) error {
-	return c.do("POST", endpoint, reqBody, respBody)
+	return c.doURL("POST", BaseURL+endpoint, reqBody, respBody)
+}
+
+func (c *Client) postURL(url string, reqBody, respBody any) error {
+	return c.doURL("POST", url, reqBody, respBody)
 }
 
 func (c *Client) authBody() map[string]string {
