@@ -1,6 +1,6 @@
 {
   "name": "opork",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "CLI wrapper for Porkbun API, optimized for agentic use",
   "bin": {
     "opork": "bin/opork"
