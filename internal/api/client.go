@@ -32,10 +32,6 @@ type Response struct {
 	Message string `json:"message,omitempty"`
 }
 
-func (c *Client) do(method, endpoint string, reqBody, respBody any) error {
-	return c.doURL(method, BaseURL+endpoint, reqBody, respBody)
-}
-
 func (c *Client) doURL(method, url string, reqBody, respBody any) error {
 	var body io.Reader
 	if reqBody != nil {
