@@ -12,6 +12,15 @@ var sslCmd = &cobra.Command{
 	Short: "Manage SSL certificates",
 }
 
+func validateSSLPart(part string) error {
+	switch part {
+	case "", "cert", "key", "intermediate", "public":
+		return nil
+	default:
+		return fmt.Errorf("invalid part %q: use cert, key, intermediate, or public", part)
+	}
+}
+
 var sslGetCmd = &cobra.Command{
 	Use:   "get <domain>",
 	Short: "Retrieve SSL certificate bundle",
@@ -24,12 +33,15 @@ print only non-sensitive parts, e.g. when piping JSON output into logs
 or other tooling.`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		part, _ := cmd.Flags().GetString("part")
+		if err := validateSSLPart(part); err != nil {
+			return err
+		}
+
 		bundle, err := apiClient.SSLRetrieve(args[0])
 		if err != nil {
 			return err
 		}
-
-		part, _ := cmd.Flags().GetString("part")
 
 		if output.JSONOutput {
 			switch part {
@@ -43,13 +55,16 @@ or other tooling.`,
 				output.PrintJSON(map[string]string{"intermediatecertificate": bundle.IntermediateCertificate})
 			case "public":
 				output.PrintJSON(map[string]string{"publickey": bundle.PublicKey})
-			default:
-				return fmt.Errorf("invalid part %q: use cert, key, intermediate, or public", part)
 			}
 			return nil
 		}
 
 		switch part {
+		case "":
+			output.Print("=== Certificate Chain ===")
+			output.Print(bundle.CertificateChain)
+			output.Print("\n=== Private Key ===")
+			output.Print(bundle.PrivateKey)
 		case "cert":
 			output.Print(bundle.CertificateChain)
 		case "key":
@@ -58,11 +73,6 @@ or other tooling.`,
 			output.Print(bundle.IntermediateCertificate)
 		case "public":
 			output.Print(bundle.PublicKey)
-		default:
-			output.Print("=== Certificate Chain ===")
-			output.Print(bundle.CertificateChain)
-			output.Print("\n=== Private Key ===")
-			output.Print(bundle.PrivateKey)
 		}
 		return nil
 	},
