@@ -48,8 +48,8 @@ var glueCreateCmd = &cobra.Command{
 	Long: `Create a glue record for a custom nameserver.
 
 Examples:
-  overpork glue create example.com ns1 192.168.1.1
-  overpork glue create example.com ns1 192.168.1.1 2001:db8::1`,
+  opork glue create example.com ns1 192.168.1.1
+  opork glue create example.com ns1 192.168.1.1 2001:db8::1`,
 	Args: cobra.MinimumNArgs(3),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		domain := args[0]

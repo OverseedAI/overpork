@@ -60,10 +60,10 @@ var dnsCreateCmd = &cobra.Command{
 	Long: `Create a DNS record for a domain.
 
 Examples:
-  overpork dns create example.com A 192.168.1.1
-  overpork dns create example.com A 192.168.1.1 --name www
-  overpork dns create example.com MX mail.example.com --prio 10
-  overpork dns create example.com TXT "v=spf1 include:_spf.google.com ~all"`,
+  opork dns create example.com A 192.168.1.1
+  opork dns create example.com A 192.168.1.1 --name www
+  opork dns create example.com MX mail.example.com --prio 10
+  opork dns create example.com TXT "v=spf1 include:_spf.google.com ~all"`,
 	Args: cobra.ExactArgs(3),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		domain := args[0]
@@ -134,8 +134,8 @@ var dnsSetCmd = &cobra.Command{
 Use @ for the root domain.
 
 Examples:
-  overpork dns set example.com A www 192.168.1.1
-  overpork dns set example.com A @ 192.168.1.1`,
+  opork dns set example.com A www 192.168.1.1
+  opork dns set example.com A @ 192.168.1.1`,
 	Args: cobra.ExactArgs(4),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		domain := args[0]
@@ -199,8 +199,8 @@ var dnsDeleteByNameCmd = &cobra.Command{
 Use @ for the root domain.
 
 Examples:
-  overpork dns delete-by-name example.com A www
-  overpork dns delete-by-name example.com A @`,
+  opork dns delete-by-name example.com A www
+  opork dns delete-by-name example.com A @`,
 	Args: cobra.ExactArgs(3),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		domain := args[0]
