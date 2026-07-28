@@ -52,7 +52,9 @@ func (c *Client) doURL(method, url string, reqBody, respBody any) error {
 	if err != nil {
 		return fmt.Errorf("request failed: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	respData, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -78,10 +80,6 @@ func (c *Client) doURL(method, url string, reqBody, respBody any) error {
 
 func (c *Client) post(endpoint string, reqBody, respBody any) error {
 	return c.doURL("POST", BaseURL+endpoint, reqBody, respBody)
-}
-
-func (c *Client) postURL(url string, reqBody, respBody any) error {
-	return c.doURL("POST", url, reqBody, respBody)
 }
 
 func (c *Client) authBody() map[string]string {

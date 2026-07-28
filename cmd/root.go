@@ -29,6 +29,11 @@ var rootCmd = &cobra.Command{
 				return nil
 			}
 		}
+		// The pricing list is public; availability checks still require auth.
+		if cmd == pricingListCmd {
+			apiClient = api.NewClient(&config.Config{})
+			return nil
+		}
 
 		var err error
 		cfg, err = config.Load()
