@@ -206,9 +206,9 @@ var domainRegisterCmd = &cobra.Command{
 	Long: `Register a new domain.
 
 Examples:
-  overpork domain register example.com
-  overpork domain register example.com --years 2
-  overpork domain register example.com --ns ns1.example.com --ns ns2.example.com`,
+  opork domain register example.com
+  opork domain register example.com --years 2
+  opork domain register example.com --ns ns1.example.com --ns ns2.example.com`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		domain := args[0]
