@@ -52,7 +52,9 @@ func (c *Client) doURL(method, url string, reqBody, respBody any) error {
 	if err != nil {
 		return fmt.Errorf("request failed: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	respData, err := io.ReadAll(resp.Body)
 	if err != nil {

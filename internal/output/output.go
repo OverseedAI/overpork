@@ -22,7 +22,7 @@ func Print(v any) {
 		_ = enc.Encode(v)
 		return
 	}
-	fmt.Fprintln(Stdout, v)
+	_, _ = fmt.Fprintln(Stdout, v)
 }
 
 func PrintJSON(v any) {
@@ -70,28 +70,28 @@ func PrintTable(headers []string, rows [][]string) {
 	w := tabwriter.NewWriter(Stdout, 0, 0, 2, ' ', 0)
 	for i, h := range headers {
 		if i > 0 {
-			fmt.Fprint(w, "\t")
+			_, _ = fmt.Fprint(w, "\t")
 		}
-		fmt.Fprint(w, h)
+		_, _ = fmt.Fprint(w, h)
 	}
-	fmt.Fprintln(w)
+	_, _ = fmt.Fprintln(w)
 
 	for _, row := range rows {
 		for i, col := range row {
 			if i > 0 {
-				fmt.Fprint(w, "\t")
+				_, _ = fmt.Fprint(w, "\t")
 			}
-			fmt.Fprint(w, col)
+			_, _ = fmt.Fprint(w, col)
 		}
-		fmt.Fprintln(w)
+		_, _ = fmt.Fprintln(w)
 	}
-	w.Flush()
+	_ = w.Flush()
 }
 
 func Error(format string, args ...any) {
-	fmt.Fprintf(Stderr, "error: "+format+"\n", args...)
+	_, _ = fmt.Fprintf(Stderr, "error: "+format+"\n", args...)
 }
 
 func Success(format string, args ...any) {
-	fmt.Fprintf(Stdout, format+"\n", args...)
+	_, _ = fmt.Fprintf(Stdout, format+"\n", args...)
 }

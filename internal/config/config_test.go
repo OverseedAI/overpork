@@ -1,18 +1,10 @@
 package config
 
-import (
-	"os"
-	"testing"
-)
+import "testing"
 
 func TestLoadFromEnv(t *testing.T) {
-	// Set env vars
-	os.Setenv("PORKBUN_API_KEY", "test-api-key")
-	os.Setenv("PORKBUN_SECRET_KEY", "test-secret-key")
-	defer func() {
-		os.Unsetenv("PORKBUN_API_KEY")
-		os.Unsetenv("PORKBUN_SECRET_KEY")
-	}()
+	t.Setenv("PORKBUN_API_KEY", "test-api-key")
+	t.Setenv("PORKBUN_SECRET_KEY", "test-secret-key")
 
 	cfg, err := Load()
 	if err != nil {
