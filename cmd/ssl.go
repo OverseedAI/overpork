@@ -14,7 +14,12 @@ var sslGetCmd = &cobra.Command{
 	Use:   "get <domain>",
 	Short: "Retrieve SSL certificate bundle",
 	Long: `Retrieve the SSL certificate bundle for a domain.
-Outputs certificate, intermediate cert, and private key.`,
+Outputs certificate, intermediate cert, and private key.
+
+WARNING: without --part, the output (including JSON output with --json)
+contains the PRIVATE KEY. Use --part cert, intermediate, or public to
+print only non-sensitive parts, e.g. when piping JSON output into logs
+or other tooling.`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		bundle, err := apiClient.SSLRetrieve(args[0])
@@ -31,9 +36,11 @@ Outputs certificate, intermediate cert, and private key.`,
 					output.PrintJSON(map[string]string{"certificatechain": bundle.CertificateChain})
 				case "key":
 					output.PrintJSON(map[string]string{"privatekey": bundle.PrivateKey})
-				case "intermediate":
-					output.PrintJSON(map[string]string{"intermediatecertificate": bundle.IntermediateCertificate})
-				default:
+			case "intermediate":
+				output.PrintJSON(map[string]string{"intermediatecertificate": bundle.IntermediateCertificate})
+			case "public":
+				output.PrintJSON(map[string]string{"publickey": bundle.PublicKey})
+			default:
 					output.PrintJSON(bundle)
 				}
 			} else {
