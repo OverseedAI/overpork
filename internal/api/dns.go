@@ -2,6 +2,17 @@ package api
 
 import "fmt"
 
+// dnsByNameTypeEndpoint builds the endpoint for the *ByNameType DNS
+// endpoints. The subdomain segment is omitted for root-domain records,
+// since the API does not accept a trailing slash there.
+func dnsByNameTypeEndpoint(action, domain, recordType, subdomain string) string {
+	endpoint := fmt.Sprintf("/dns/%s/%s/%s", action, domain, recordType)
+	if subdomain != "" {
+		endpoint += "/" + subdomain
+	}
+	return endpoint
+}
+
 type DNSRecord struct {
 	ID      string `json:"id"`
 	Name    string `json:"name"`
@@ -42,8 +53,7 @@ func (c *Client) DNSListByType(domain, recordType string) ([]DNSRecord, error) {
 
 func (c *Client) DNSListByTypeAndSubdomain(domain, recordType, subdomain string) ([]DNSRecord, error) {
 	var resp dnsListResponse
-	endpoint := fmt.Sprintf("/dns/retrieveByNameType/%s/%s/%s", domain, recordType, subdomain)
-	err := c.post(endpoint, c.authBody(), &resp)
+	err := c.post(dnsByNameTypeEndpoint("retrieveByNameType", domain, recordType, subdomain), c.authBody(), &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -114,8 +124,7 @@ func (c *Client) DNSUpdateByTypeAndSubdomain(domain, recordType, subdomain, cont
 	}
 
 	var resp Response
-	endpoint := fmt.Sprintf("/dns/editByNameType/%s/%s/%s", domain, recordType, subdomain)
-	return c.post(endpoint, body, &resp)
+	return c.post(dnsByNameTypeEndpoint("editByNameType", domain, recordType, subdomain), body, &resp)
 }
 
 func (c *Client) DNSDelete(domain, recordID string) error {
@@ -125,6 +134,5 @@ func (c *Client) DNSDelete(domain, recordID string) error {
 
 func (c *Client) DNSDeleteByTypeAndSubdomain(domain, recordType, subdomain string) error {
 	var resp Response
-	endpoint := fmt.Sprintf("/dns/deleteByNameType/%s/%s/%s", domain, recordType, subdomain)
-	return c.post(endpoint, c.authBody(), &resp)
+	return c.post(dnsByNameTypeEndpoint("deleteByNameType", domain, recordType, subdomain), c.authBody(), &resp)
 }

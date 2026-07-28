@@ -20,10 +20,16 @@ var dnsListCmd = &cobra.Command{
 		recordType, _ := cmd.Flags().GetString("type")
 		subdomain, _ := cmd.Flags().GetString("subdomain")
 
+		// Handle @ as empty string for root
+		subdomainSet := cmd.Flags().Changed("subdomain")
+		if subdomain == "@" {
+			subdomain = ""
+		}
+
 		var records []api.DNSRecord
 		var err error
 
-		if recordType != "" && subdomain != "" {
+		if recordType != "" && (subdomain != "" || subdomainSet) {
 			records, err = apiClient.DNSListByTypeAndSubdomain(domain, recordType, subdomain)
 		} else if recordType != "" {
 			records, err = apiClient.DNSListByType(domain, recordType)
