@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/OverseedAI/overpork/internal/output"
 	"github.com/spf13/cobra"
 )
@@ -30,21 +32,19 @@ or other tooling.`,
 		part, _ := cmd.Flags().GetString("part")
 
 		if output.JSONOutput {
-			if part != "" {
-				switch part {
-				case "cert":
-					output.PrintJSON(map[string]string{"certificatechain": bundle.CertificateChain})
-				case "key":
-					output.PrintJSON(map[string]string{"privatekey": bundle.PrivateKey})
+			switch part {
+			case "":
+				output.PrintJSON(bundle)
+			case "cert":
+				output.PrintJSON(map[string]string{"certificatechain": bundle.CertificateChain})
+			case "key":
+				output.PrintJSON(map[string]string{"privatekey": bundle.PrivateKey})
 			case "intermediate":
 				output.PrintJSON(map[string]string{"intermediatecertificate": bundle.IntermediateCertificate})
 			case "public":
 				output.PrintJSON(map[string]string{"publickey": bundle.PublicKey})
 			default:
-					output.PrintJSON(bundle)
-				}
-			} else {
-				output.PrintJSON(bundle)
+				return fmt.Errorf("invalid part %q: use cert, key, intermediate, or public", part)
 			}
 			return nil
 		}
