@@ -11,6 +11,13 @@ var dnsCmd = &cobra.Command{
 	Short: "Manage DNS records",
 }
 
+func normalizeDNSSubdomain(subdomain string) string {
+	if subdomain == "@" {
+		return ""
+	}
+	return subdomain
+}
+
 var dnsListCmd = &cobra.Command{
 	Use:   "list <domain>",
 	Short: "List DNS records for a domain",
@@ -20,10 +27,13 @@ var dnsListCmd = &cobra.Command{
 		recordType, _ := cmd.Flags().GetString("type")
 		subdomain, _ := cmd.Flags().GetString("subdomain")
 
+		subdomainSet := cmd.Flags().Changed("subdomain")
+		subdomain = normalizeDNSSubdomain(subdomain)
+
 		var records []api.DNSRecord
 		var err error
 
-		if recordType != "" && subdomain != "" {
+		if recordType != "" && (subdomain != "" || subdomainSet) {
 			records, err = apiClient.DNSListByTypeAndSubdomain(domain, recordType, subdomain)
 		} else if recordType != "" {
 			records, err = apiClient.DNSListByType(domain, recordType)
@@ -143,10 +153,7 @@ Examples:
 		subdomain := args[2]
 		content := args[3]
 
-		// Handle @ as empty string for root
-		if subdomain == "@" {
-			subdomain = ""
-		}
+		subdomain = normalizeDNSSubdomain(subdomain)
 
 		name, _ := cmd.Flags().GetString("name")
 		ttl, _ := cmd.Flags().GetString("ttl")
@@ -207,9 +214,7 @@ Examples:
 		recordType := args[1]
 		subdomain := args[2]
 
-		if subdomain == "@" {
-			subdomain = ""
-		}
+		subdomain = normalizeDNSSubdomain(subdomain)
 
 		if err := apiClient.DNSDeleteByTypeAndSubdomain(domain, recordType, subdomain); err != nil {
 			return err
