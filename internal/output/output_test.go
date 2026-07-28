@@ -33,6 +33,30 @@ func TestPrintJSON(t *testing.T) {
 	}
 }
 
+func TestPrintJSONNilSlice(t *testing.T) {
+	var buf bytes.Buffer
+	Stdout = &buf
+
+	var records []string
+	PrintJSON(records)
+
+	if got := buf.String(); got != "[]\n" {
+		t.Errorf("PrintJSON() nil slice = %q, want %q", got, "[]\n")
+	}
+}
+
+func TestPrintJSONNilMap(t *testing.T) {
+	var buf bytes.Buffer
+	Stdout = &buf
+
+	var m map[string]string
+	PrintJSON(m)
+
+	if got := buf.String(); got != "{}\n" {
+		t.Errorf("PrintJSON() nil map = %q, want %q", got, "{}\n")
+	}
+}
+
 func TestPrintTable(t *testing.T) {
 	var buf bytes.Buffer
 	Stdout = &buf

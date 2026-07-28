@@ -12,7 +12,11 @@ var pingCmd = &cobra.Command{
 		if err := apiClient.Ping(); err != nil {
 			return err
 		}
-		output.Success("OK")
+		if output.JSONOutput {
+			output.PrintJSON(map[string]string{"status": "OK"})
+		} else {
+			output.Success("OK")
+		}
 		return nil
 	},
 }

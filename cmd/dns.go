@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/OverseedAI/overpork/internal/api"
 	"github.com/OverseedAI/overpork/internal/output"
 	"github.com/spf13/cobra"
@@ -19,6 +21,10 @@ var dnsListCmd = &cobra.Command{
 		domain := args[0]
 		recordType, _ := cmd.Flags().GetString("type")
 		subdomain, _ := cmd.Flags().GetString("subdomain")
+
+		if subdomain != "" && recordType == "" {
+			return fmt.Errorf("--subdomain requires --type")
+		}
 
 		var records []api.DNSRecord
 		var err error

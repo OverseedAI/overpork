@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"reflect"
 	"text/tabwriter"
 )
 
@@ -27,7 +28,27 @@ func Print(v any) {
 func PrintJSON(v any) {
 	enc := json.NewEncoder(Stdout)
 	enc.SetIndent("", "  ")
-	_ = enc.Encode(v)
+	_ = enc.Encode(normalizeEmpty(v))
+}
+
+// normalizeEmpty converts nil slices and maps to empty ones so they
+// marshal as [] and {} instead of null.
+func normalizeEmpty(v any) any {
+	rv := reflect.ValueOf(v)
+	if !rv.IsValid() {
+		return v
+	}
+	switch rv.Kind() {
+	case reflect.Slice:
+		if rv.IsNil() {
+			return reflect.MakeSlice(rv.Type(), 0, 0).Interface()
+		}
+	case reflect.Map:
+		if rv.IsNil() {
+			return reflect.MakeMap(rv.Type()).Interface()
+		}
+	}
+	return v
 }
 
 func PrintTable(headers []string, rows [][]string) {
