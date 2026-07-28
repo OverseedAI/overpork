@@ -29,12 +29,10 @@ var rootCmd = &cobra.Command{
 				return nil
 			}
 		}
-		// Pricing endpoints are unauthenticated; use a client without credentials
-		for c := cmd; c != nil; c = c.Parent() {
-			if c.Name() == "pricing" {
-				apiClient = api.NewClient(&config.Config{})
-				return nil
-			}
+		// The pricing list is public; availability checks still require auth.
+		if cmd == pricingListCmd {
+			apiClient = api.NewClient(&config.Config{})
+			return nil
 		}
 
 		var err error

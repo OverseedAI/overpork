@@ -80,10 +80,6 @@ func (c *Client) post(endpoint string, reqBody, respBody any) error {
 	return c.doURL("POST", BaseURL+endpoint, reqBody, respBody)
 }
 
-func (c *Client) postURL(url string, reqBody, respBody any) error {
-	return c.doURL("POST", url, reqBody, respBody)
-}
-
 func (c *Client) authBody() map[string]string {
 	return map[string]string{
 		"apikey":       c.apiKey,

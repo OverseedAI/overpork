@@ -2,8 +2,6 @@ package api
 
 import "fmt"
 
-const PricingURL = "https://porkbun.com/api/json/v3"
-
 type Pricing struct {
 	Registration    string `json:"registration"`
 	Renewal         string `json:"renewal"`
@@ -20,8 +18,7 @@ type pricingResponse struct {
 
 func (c *Client) PricingList() (map[string]Pricing, error) {
 	var resp pricingResponse
-	// Pricing endpoint uses porkbun.com (not api.porkbun.com)
-	err := c.postURL(PricingURL+"/pricing/get", map[string]string{}, &resp)
+	err := c.post("/pricing/get", map[string]string{}, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -34,8 +31,7 @@ func (c *Client) DomainCheck(domain string) (bool, float64, error) {
 		Available string `json:"avail"`
 		Price     string `json:"price"`
 	}
-	// Auth not required for availability check
-	err := c.post("/domain/checkDomain/"+domain, map[string]string{}, &resp)
+	err := c.post("/domain/checkDomain/"+domain, c.authBody(), &resp)
 	if err != nil {
 		return false, 0, err
 	}
