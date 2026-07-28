@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/OverseedAI/overpork/internal/output"
 	"github.com/spf13/cobra"
 )
@@ -10,39 +12,59 @@ var sslCmd = &cobra.Command{
 	Short: "Manage SSL certificates",
 }
 
+func validateSSLPart(part string) error {
+	switch part {
+	case "", "cert", "key", "intermediate", "public":
+		return nil
+	default:
+		return fmt.Errorf("invalid part %q: use cert, key, intermediate, or public", part)
+	}
+}
+
 var sslGetCmd = &cobra.Command{
 	Use:   "get <domain>",
 	Short: "Retrieve SSL certificate bundle",
 	Long: `Retrieve the SSL certificate bundle for a domain.
-Outputs certificate, intermediate cert, and private key.`,
+Outputs certificate, intermediate cert, and private key.
+
+WARNING: without --part, the output (including JSON output with --json)
+contains the PRIVATE KEY. Use --part cert, intermediate, or public to
+print only non-sensitive parts, e.g. when piping JSON output into logs
+or other tooling.`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		part, _ := cmd.Flags().GetString("part")
+		if err := validateSSLPart(part); err != nil {
+			return err
+		}
+
 		bundle, err := apiClient.SSLRetrieve(args[0])
 		if err != nil {
 			return err
 		}
 
-		part, _ := cmd.Flags().GetString("part")
-
 		if output.JSONOutput {
-			if part != "" {
-				switch part {
-				case "cert":
-					output.PrintJSON(map[string]string{"certificatechain": bundle.CertificateChain})
-				case "key":
-					output.PrintJSON(map[string]string{"privatekey": bundle.PrivateKey})
-				case "intermediate":
-					output.PrintJSON(map[string]string{"intermediatecertificate": bundle.IntermediateCertificate})
-				default:
-					output.PrintJSON(bundle)
-				}
-			} else {
+			switch part {
+			case "":
 				output.PrintJSON(bundle)
+			case "cert":
+				output.PrintJSON(map[string]string{"certificatechain": bundle.CertificateChain})
+			case "key":
+				output.PrintJSON(map[string]string{"privatekey": bundle.PrivateKey})
+			case "intermediate":
+				output.PrintJSON(map[string]string{"intermediatecertificate": bundle.IntermediateCertificate})
+			case "public":
+				output.PrintJSON(map[string]string{"publickey": bundle.PublicKey})
 			}
 			return nil
 		}
 
 		switch part {
+		case "":
+			output.Print("=== Certificate Chain ===")
+			output.Print(bundle.CertificateChain)
+			output.Print("\n=== Private Key ===")
+			output.Print(bundle.PrivateKey)
 		case "cert":
 			output.Print(bundle.CertificateChain)
 		case "key":
@@ -51,11 +73,6 @@ Outputs certificate, intermediate cert, and private key.`,
 			output.Print(bundle.IntermediateCertificate)
 		case "public":
 			output.Print(bundle.PublicKey)
-		default:
-			output.Print("=== Certificate Chain ===")
-			output.Print(bundle.CertificateChain)
-			output.Print("\n=== Private Key ===")
-			output.Print(bundle.PrivateKey)
 		}
 		return nil
 	},
