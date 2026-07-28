@@ -23,7 +23,11 @@ Or create a config file:
 opork config init --api-key pk1_xxx --secret-key sk1_xxx
 ```
 
-Config file location: `~/.config/opork/config.yaml`
+Config file location: run `opork config path` to print the exact path for your system. The file lives in an `overpork` subdirectory of the OS-specific user config directory (`os.UserConfigDir()`), so the defaults are:
+
+- **macOS**: `~/Library/Application Support/overpork/config.yaml`
+- **Linux**: `~/.config/overpork/config.yaml` (or `$XDG_CONFIG_HOME/overpork/config.yaml` if `$XDG_CONFIG_HOME` is set)
+- **Windows**: `%AppData%\overpork\config.yaml` (e.g. `C:\Users\<you>\AppData\Roaming\overpork\config.yaml`)
 
 ## Commands
 
