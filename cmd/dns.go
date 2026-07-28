@@ -13,6 +13,13 @@ var dnsCmd = &cobra.Command{
 	Short: "Manage DNS records",
 }
 
+func normalizeDNSSubdomain(subdomain string) string {
+	if subdomain == "@" {
+		return ""
+	}
+	return subdomain
+}
+
 var dnsListCmd = &cobra.Command{
 	Use:   "list <domain>",
 	Short: "List DNS records for a domain",
@@ -22,14 +29,16 @@ var dnsListCmd = &cobra.Command{
 		recordType, _ := cmd.Flags().GetString("type")
 		subdomain, _ := cmd.Flags().GetString("subdomain")
 
-		if subdomain != "" && recordType == "" {
+		subdomainSet := cmd.Flags().Changed("subdomain")
+		if subdomainSet && recordType == "" {
 			return fmt.Errorf("--subdomain requires --type")
 		}
+		subdomain = normalizeDNSSubdomain(subdomain)
 
 		var records []api.DNSRecord
 		var err error
 
-		if recordType != "" && subdomain != "" {
+		if recordType != "" && (subdomain != "" || subdomainSet) {
 			records, err = apiClient.DNSListByTypeAndSubdomain(domain, recordType, subdomain)
 		} else if recordType != "" {
 			records, err = apiClient.DNSListByType(domain, recordType)
@@ -66,10 +75,10 @@ var dnsCreateCmd = &cobra.Command{
 	Long: `Create a DNS record for a domain.
 
 Examples:
-  overpork dns create example.com A 192.168.1.1
-  overpork dns create example.com A 192.168.1.1 --name www
-  overpork dns create example.com MX mail.example.com --prio 10
-  overpork dns create example.com TXT "v=spf1 include:_spf.google.com ~all"`,
+  opork dns create example.com A 192.168.1.1
+  opork dns create example.com A 192.168.1.1 --name www
+  opork dns create example.com MX mail.example.com --prio 10
+  opork dns create example.com TXT "v=spf1 include:_spf.google.com ~all"`,
 	Args: cobra.ExactArgs(3),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		domain := args[0]
@@ -140,8 +149,8 @@ var dnsSetCmd = &cobra.Command{
 Use @ for the root domain.
 
 Examples:
-  overpork dns set example.com A www 192.168.1.1
-  overpork dns set example.com A @ 192.168.1.1`,
+  opork dns set example.com A www 192.168.1.1
+  opork dns set example.com A @ 192.168.1.1`,
 	Args: cobra.ExactArgs(4),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		domain := args[0]
@@ -149,10 +158,7 @@ Examples:
 		subdomain := args[2]
 		content := args[3]
 
-		// Handle @ as empty string for root
-		if subdomain == "@" {
-			subdomain = ""
-		}
+		subdomain = normalizeDNSSubdomain(subdomain)
 
 		name, _ := cmd.Flags().GetString("name")
 		ttl, _ := cmd.Flags().GetString("ttl")
@@ -205,17 +211,15 @@ var dnsDeleteByNameCmd = &cobra.Command{
 Use @ for the root domain.
 
 Examples:
-  overpork dns delete-by-name example.com A www
-  overpork dns delete-by-name example.com A @`,
+  opork dns delete-by-name example.com A www
+  opork dns delete-by-name example.com A @`,
 	Args: cobra.ExactArgs(3),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		domain := args[0]
 		recordType := args[1]
 		subdomain := args[2]
 
-		if subdomain == "@" {
-			subdomain = ""
-		}
+		subdomain = normalizeDNSSubdomain(subdomain)
 
 		if err := apiClient.DNSDeleteByTypeAndSubdomain(domain, recordType, subdomain); err != nil {
 			return err
