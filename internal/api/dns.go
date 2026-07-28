@@ -1,10 +1,12 @@
 package api
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
-// dnsByNameTypeEndpoint builds the endpoint for the *ByNameType DNS
-// endpoints. The subdomain segment is omitted for root-domain records,
-// since the API does not accept a trailing slash there.
+// dnsByNameTypeEndpoint uses the canonical endpoint form, omitting the
+// optional subdomain segment for root-domain records.
 func dnsByNameTypeEndpoint(action, domain, recordType, subdomain string) string {
 	endpoint := fmt.Sprintf("/dns/%s/%s/%s", action, domain, recordType)
 	if subdomain != "" {
@@ -43,12 +45,21 @@ func (c *Client) DNSList(domain string) ([]DNSRecord, error) {
 }
 
 func (c *Client) DNSListByType(domain, recordType string) ([]DNSRecord, error) {
-	var resp dnsListResponse
-	err := c.post(fmt.Sprintf("/dns/retrieveByNameType/%s/%s", domain, recordType), c.authBody(), &resp)
+	records, err := c.DNSList(domain)
 	if err != nil {
 		return nil, err
 	}
-	return resp.Records, nil
+	return filterDNSRecordsByType(records, recordType), nil
+}
+
+func filterDNSRecordsByType(records []DNSRecord, recordType string) []DNSRecord {
+	filtered := make([]DNSRecord, 0)
+	for _, record := range records {
+		if strings.EqualFold(record.Type, recordType) {
+			filtered = append(filtered, record)
+		}
+	}
+	return filtered
 }
 
 func (c *Client) DNSListByTypeAndSubdomain(domain, recordType, subdomain string) ([]DNSRecord, error) {

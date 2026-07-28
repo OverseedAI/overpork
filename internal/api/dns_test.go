@@ -2,6 +2,24 @@ package api
 
 import "testing"
 
+func TestFilterDNSRecordsByType(t *testing.T) {
+	records := []DNSRecord{
+		{ID: "1", Type: "A", Name: "example.com"},
+		{ID: "2", Type: "AAAA", Name: "example.com"},
+		{ID: "3", Type: "A", Name: "www.example.com"},
+	}
+
+	got := filterDNSRecordsByType(records, "a")
+	if len(got) != 2 || got[0].ID != "1" || got[1].ID != "3" {
+		t.Fatalf("filterDNSRecordsByType() = %#v, want A records 1 and 3", got)
+	}
+
+	got = filterDNSRecordsByType(records, "MX")
+	if got == nil || len(got) != 0 {
+		t.Fatalf("filterDNSRecordsByType() = %#v, want a non-nil empty slice", got)
+	}
+}
+
 func TestDNSByNameTypeEndpoint(t *testing.T) {
 	tests := []struct {
 		name       string
