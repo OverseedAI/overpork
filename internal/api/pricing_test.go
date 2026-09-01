@@ -67,7 +67,7 @@ func TestDomainCheckSendsCredentials(t *testing.T) {
 				t.Fatalf("DomainCheck() request body omitted credentials: %#v", body)
 			}
 
-			return jsonHTTPResponse(`{"status":"SUCCESS","avail":"yes","price":"9.73"}`), nil
+			return jsonHTTPResponse(`{"status":"SUCCESS","response":{"avail":"yes","price":"9.73"}}`), nil
 		})},
 	}
 
