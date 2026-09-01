@@ -1,6 +1,9 @@
 package api
 
-import "fmt"
+import (
+	"fmt"
+	"sort"
+)
 
 type DNSSECRecord struct {
 	KeyTag     string `json:"keyTag"`
@@ -13,7 +16,15 @@ type DNSSECRecord struct {
 
 type dnssecListResponse struct {
 	Response
-	Records []DNSSECRecord `json:"records"`
+	Records map[string]dnssecListRecord `json:"records"`
+}
+
+type dnssecListRecord struct {
+	Algorithm  string `json:"alg"`
+	DigestType string `json:"digestType"`
+	Digest     string `json:"digest"`
+	PublicKey  string `json:"pubKey,omitempty"`
+	Flags      string `json:"flags,omitempty"`
 }
 
 func (c *Client) DNSSECList(domain string) ([]DNSSECRecord, error) {
@@ -22,7 +33,25 @@ func (c *Client) DNSSECList(domain string) ([]DNSSECRecord, error) {
 	if err != nil {
 		return nil, err
 	}
-	return resp.Records, nil
+	keyTags := make([]string, 0, len(resp.Records))
+	for keyTag := range resp.Records {
+		keyTags = append(keyTags, keyTag)
+	}
+	sort.Strings(keyTags)
+
+	records := make([]DNSSECRecord, 0, len(keyTags))
+	for _, keyTag := range keyTags {
+		record := resp.Records[keyTag]
+		records = append(records, DNSSECRecord{
+			KeyTag:     keyTag,
+			Algorithm:  record.Algorithm,
+			DigestType: record.DigestType,
+			Digest:     record.Digest,
+			PublicKey:  record.PublicKey,
+			Flags:      record.Flags,
+		})
+	}
+	return records, nil
 }
 
 func (c *Client) DNSSECCreate(domain string, record DNSSECRecord) error {
