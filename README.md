@@ -31,12 +31,8 @@ export PORKBUN_SECRET_KEY=sk1_xxx
 Or create a config file:
 
 ```bash
-opork config init
+opork config init --api-key pk1_xxx --secret-key sk1_xxx
 ```
-
-Interactive setup keeps the secret key out of shell history and process
-arguments. Run `opork config path` first and back up an existing file before
-reinitializing it; `config init` overwrites the file without prompting.
 
 Config file location: run `opork config path` to print the exact path for your system. The file lives in an `overpork` subdirectory of the OS-specific user config directory (`os.UserConfigDir()`), so the defaults are:
 
@@ -75,24 +71,15 @@ opork dns delete <domain> <id>
 opork dns delete-by-name <domain> <type> <subdomain>
 ```
 
-`dns set` and `dns delete-by-name` can affect every record matching the
-type/subdomain pair. List records first and prefer record-ID operations when
-more than one match exists.
-
 ### Domains
 
 ```bash
 opork domain list
 opork domain get <domain>
-```
 
-The `opork domain register` command exists but must not be used with Porkbun's
-current registration flow. It does not yet send the required exact price,
-explicit terms acceptance, dry-run request, or idempotency key. Use
-`opork pricing check <domain> --json` for availability, then register on the
-Porkbun website.
+opork domain register <domain>
+opork domain register example.com --years 2 --ns ns1.example.com --ns ns2.example.com
 
-```bash
 opork domain auto-renew <domain> enable
 opork domain auto-renew <domain> disable
 
@@ -114,14 +101,11 @@ opork pricing check <domain>  # Check availability and price
 ### SSL Certificates
 
 ```bash
+opork ssl get <domain>
 opork ssl get <domain> --part cert
+opork ssl get <domain> --part key
 opork ssl get <domain> --part intermediate
-opork ssl get <domain> --part public
 ```
-
-Without `--part`, the output includes the private key. Use `--part key` only
-when the private key is explicitly required and the output has a secure
-destination.
 
 ### DNSSEC
 
@@ -140,12 +124,9 @@ opork glue update <domain> <subdomain> <ip> [ip...]
 opork glue delete <domain> <subdomain>
 ```
 
-`glue update` replaces the complete IP set. List the current record first and
-include every address that should remain.
-
 ## JSON Output
 
-Add `--json` to supported data-producing commands for JSON output:
+Add `--json` to any command for JSON output:
 
 ```bash
 opork dns list example.com --json
