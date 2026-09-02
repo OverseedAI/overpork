@@ -28,19 +28,21 @@ func (c *Client) PricingList() (map[string]Pricing, error) {
 func (c *Client) DomainCheck(domain string) (bool, float64, error) {
 	var resp struct {
 		Response
-		Available string `json:"avail"`
-		Price     string `json:"price"`
+		Domain struct {
+			Available string `json:"avail"`
+			Price     string `json:"price"`
+		} `json:"response"`
 	}
 	err := c.post("/domain/checkDomain/"+domain, c.authBody(), &resp)
 	if err != nil {
 		return false, 0, err
 	}
 
-	available := resp.Available == "yes"
+	available := resp.Domain.Available == "yes"
 	var price float64
-	if resp.Price != "" {
+	if resp.Domain.Price != "" {
 		// Price is a string, parse it
-		_, _ = fmt.Sscanf(resp.Price, "%f", &price)
+		_, _ = fmt.Sscanf(resp.Domain.Price, "%f", &price)
 	}
 	return available, price, nil
 }
