@@ -8,6 +8,17 @@ CLI wrapper for the Porkbun API, optimized for agentic use.
 npm install -g opork
 ```
 
+### Agent Skill
+
+Install the bundled skill with the [Skills CLI](https://skills.sh/):
+
+```bash
+npx skills add OverseedAI/overpork --skill opork
+```
+
+The skill teaches compatible agents to use `opork` safely for Porkbun domain,
+DNS, pricing, SSL, DNSSEC, and glue-record operations.
+
 ## Configuration
 
 Set credentials via environment variables:
