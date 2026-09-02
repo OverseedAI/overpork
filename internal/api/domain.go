@@ -1,6 +1,9 @@
 package api
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 type Domain struct {
 	Domain       string `json:"domain"`
@@ -20,17 +23,37 @@ type domainListResponse struct {
 }
 
 type domainGetResponse struct {
-	Status       string `json:"status"`
-	Message      string `json:"message,omitempty"`
-	Domain       string `json:"domain"`
-	DomainStatus string `json:"domainStatus"`
-	TLD          string `json:"tld"`
-	CreateDate   string `json:"createDate"`
-	ExpireDate   string `json:"expireDate"`
-	SecurityLock string `json:"securityLock"`
-	WhoisPrivacy string `json:"whoisPrivacy"`
-	AutoRenew    string `json:"autoRenew"`
-	NotLocal     int    `json:"notLocal"`
+	Response
+	Domain domainGetDomain `json:"domain"`
+}
+
+type domainGetDomain struct {
+	Domain       string         `json:"domain"`
+	Status       string         `json:"status"`
+	TLD          string         `json:"tld"`
+	CreateDate   string         `json:"createDate"`
+	ExpireDate   string         `json:"expireDate"`
+	SecurityLock stringOrNumber `json:"securityLock"`
+	WhoisPrivacy stringOrNumber `json:"whoisPrivacy"`
+	AutoRenew    stringOrNumber `json:"autoRenew"`
+	NotLocal     int            `json:"notLocal"`
+}
+
+type stringOrNumber string
+
+func (s *stringOrNumber) UnmarshalJSON(data []byte) error {
+	var stringValue string
+	if err := json.Unmarshal(data, &stringValue); err == nil {
+		*s = stringOrNumber(stringValue)
+		return nil
+	}
+
+	var numberValue json.Number
+	if err := json.Unmarshal(data, &numberValue); err != nil {
+		return err
+	}
+	*s = stringOrNumber(numberValue.String())
+	return nil
 }
 
 func (c *Client) DomainList(start int) ([]Domain, error) {
@@ -49,20 +72,20 @@ func (c *Client) DomainList(start int) ([]Domain, error) {
 
 func (c *Client) DomainGet(domain string) (*Domain, error) {
 	var resp domainGetResponse
-	err := c.post(fmt.Sprintf("/domain/getDomain/%s", domain), c.authBody(), &resp)
+	err := c.post(fmt.Sprintf("/domain/get/%s", domain), c.authBody(), &resp)
 	if err != nil {
 		return nil, err
 	}
 	return &Domain{
-		Domain:       resp.Domain,
-		Status:       resp.DomainStatus,
-		TLD:          resp.TLD,
-		CreateDate:   resp.CreateDate,
-		ExpireDate:   resp.ExpireDate,
-		SecurityLock: resp.SecurityLock,
-		WhoisPrivacy: resp.WhoisPrivacy,
-		AutoRenew:    resp.AutoRenew,
-		NotLocal:     resp.NotLocal,
+		Domain:       resp.Domain.Domain,
+		Status:       resp.Domain.Status,
+		TLD:          resp.Domain.TLD,
+		CreateDate:   resp.Domain.CreateDate,
+		ExpireDate:   resp.Domain.ExpireDate,
+		SecurityLock: string(resp.Domain.SecurityLock),
+		WhoisPrivacy: string(resp.Domain.WhoisPrivacy),
+		AutoRenew:    string(resp.Domain.AutoRenew),
+		NotLocal:     resp.Domain.NotLocal,
 	}, nil
 }
 
