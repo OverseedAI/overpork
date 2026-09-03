@@ -68,7 +68,7 @@ func (c *Client) GlueList(domain string) ([]GlueRecord, error) {
 
 func (c *Client) GlueCreate(domain, subdomain string, ips []string) error {
 	body := c.authBodyWith(map[string]any{
-		"ip": ips,
+		"ips": ips,
 	})
 	var resp Response
 	return c.post(fmt.Sprintf("/domain/createGlue/%s/%s", domain, subdomain), body, &resp)
@@ -76,7 +76,7 @@ func (c *Client) GlueCreate(domain, subdomain string, ips []string) error {
 
 func (c *Client) GlueUpdate(domain, subdomain string, ips []string) error {
 	body := c.authBodyWith(map[string]any{
-		"ip": ips,
+		"ips": ips,
 	})
 	var resp Response
 	return c.post(fmt.Sprintf("/domain/updateGlue/%s/%s", domain, subdomain), body, &resp)

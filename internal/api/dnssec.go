@@ -57,15 +57,15 @@ func (c *Client) DNSSECList(domain string) ([]DNSSECRecord, error) {
 func (c *Client) DNSSECCreate(domain string, record DNSSECRecord) error {
 	body := c.authBodyWith(map[string]any{
 		"keyTag":     record.KeyTag,
-		"algorithm":  record.Algorithm,
+		"alg":        record.Algorithm,
 		"digestType": record.DigestType,
 		"digest":     record.Digest,
 	})
 	if record.PublicKey != "" {
-		body["publicKey"] = record.PublicKey
+		body["keyDataPubKey"] = record.PublicKey
 	}
 	if record.Flags != "" {
-		body["flags"] = record.Flags
+		body["keyDataFlags"] = record.Flags
 	}
 
 	var resp Response
