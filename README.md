@@ -31,8 +31,10 @@ export PORKBUN_SECRET_KEY=sk1_xxx
 Or create a config file:
 
 ```bash
-opork config init --api-key pk1_xxx --secret-key sk1_xxx
+opork config init
 ```
+
+This prompts for both credentials, hides the secret-key input in an interactive terminal, and saves them to the config file. The `--api-key` and `--secret-key` flags are available for non-interactive or CI use, but avoid them in an interactive shell because their values can appear in shell history and process listings.
 
 Config file location: run `opork config path` to print the exact path for your system. The file lives in an `overpork` subdirectory of the OS-specific user config directory (`os.UserConfigDir()`), so the defaults are:
 
@@ -77,9 +79,6 @@ opork dns delete-by-name <domain> <type> <subdomain>
 opork domain list
 opork domain get <domain>
 
-opork domain register <domain>
-opork domain register example.com --years 2 --ns ns1.example.com --ns ns2.example.com
-
 opork domain auto-renew <domain> enable
 opork domain auto-renew <domain> disable
 
@@ -91,6 +90,8 @@ opork domain forward-add <domain> <url> [--subdomain www] [--type permanent]
 opork domain forward-delete <domain> <id>
 ```
 
+Domain registration is currently unsupported via the CLI because it lacks the required purchase safeguards. Use [Porkbun's website](https://porkbun.com/) to register domains until CLI registration support is updated.
+
 ### Pricing
 
 ```bash
@@ -101,11 +102,14 @@ opork pricing check <domain>  # Check availability and price
 ### SSL Certificates
 
 ```bash
-opork ssl get <domain>
 opork ssl get <domain> --part cert
-opork ssl get <domain> --part key
 opork ssl get <domain> --part intermediate
+opork ssl get <domain> --part public
+opork ssl get <domain> --part key
+opork ssl get <domain>
 ```
+
+**WARNING:** Without `--part`, the output (including JSON output with `--json`) contains the **PRIVATE KEY**. Use `--part cert`, `intermediate`, or `public` to print only non-sensitive parts, such as when piping JSON output into logs or other tooling.
 
 ### DNSSEC
 
