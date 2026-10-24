@@ -85,6 +85,77 @@ func TestDomainGetDecodesDocumentedNumericFlagsAsStrings(t *testing.T) {
 	}
 }
 
+func TestDomainListDecodesNumericFlagsAsStrings(t *testing.T) {
+	client := &Client{
+		httpClient: &http.Client{Transport: roundTripFunc(func(req *http.Request) (*http.Response, error) {
+			if got, want := req.URL.String(), BaseURL+"/domain/listAll"; got != want {
+				t.Fatalf("DomainList() URL = %q, want %q", got, want)
+			}
+
+			return jsonHTTPResponse(`{
+				"status":"SUCCESS",
+				"domains":[
+					{
+						"domain":"example.com",
+						"status":"ACTIVE",
+						"tld":"com",
+						"createDate":"2024-01-02 03:04:05",
+						"expireDate":"2027-01-02 03:04:05",
+						"securityLock":1,
+						"whoisPrivacy":0,
+						"autoRenew":1,
+						"notLocal":0,
+						"apiAccess":1
+					},
+					{
+						"domain":"example.net",
+						"status":"ACTIVE",
+						"tld":"net",
+						"createDate":"2024-01-02 03:04:05",
+						"expireDate":"2027-01-02 03:04:05",
+						"securityLock":"0",
+						"whoisPrivacy":"1",
+						"autoRenew":"0",
+						"notLocal":0
+					}
+				]
+			}`), nil
+		})},
+	}
+
+	got, err := client.DomainList(0)
+	if err != nil {
+		t.Fatalf("DomainList() returned error: %v", err)
+	}
+	want := []Domain{
+		{
+			Domain:       "example.com",
+			Status:       "ACTIVE",
+			TLD:          "com",
+			CreateDate:   "2024-01-02 03:04:05",
+			ExpireDate:   "2027-01-02 03:04:05",
+			SecurityLock: "1",
+			WhoisPrivacy: "0",
+			AutoRenew:    "1",
+			NotLocal:     0,
+		},
+		{
+			Domain:       "example.net",
+			Status:       "ACTIVE",
+			TLD:          "net",
+			CreateDate:   "2024-01-02 03:04:05",
+			ExpireDate:   "2027-01-02 03:04:05",
+			SecurityLock: "0",
+			WhoisPrivacy: "1",
+			AutoRenew:    "0",
+			NotLocal:     0,
+		},
+	}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("DomainList() = %#v, want %#v", got, want)
+	}
+}
+
 func TestGlueListDecodesHostTuples(t *testing.T) {
 	client := &Client{
 		httpClient: &http.Client{Transport: roundTripFunc(func(req *http.Request) (*http.Response, error) {

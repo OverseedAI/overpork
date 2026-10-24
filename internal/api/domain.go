@@ -19,7 +19,7 @@ type Domain struct {
 
 type domainListResponse struct {
 	Response
-	Domains []Domain `json:"domains"`
+	Domains []domainGetDomain `json:"domains"`
 }
 
 type domainGetResponse struct {
@@ -37,6 +37,20 @@ type domainGetDomain struct {
 	WhoisPrivacy stringOrNumber `json:"whoisPrivacy"`
 	AutoRenew    stringOrNumber `json:"autoRenew"`
 	NotLocal     int            `json:"notLocal"`
+}
+
+func (d domainGetDomain) toDomain() Domain {
+	return Domain{
+		Domain:       d.Domain,
+		Status:       d.Status,
+		TLD:          d.TLD,
+		CreateDate:   d.CreateDate,
+		ExpireDate:   d.ExpireDate,
+		SecurityLock: string(d.SecurityLock),
+		WhoisPrivacy: string(d.WhoisPrivacy),
+		AutoRenew:    string(d.AutoRenew),
+		NotLocal:     d.NotLocal,
+	}
 }
 
 type stringOrNumber string
@@ -67,7 +81,11 @@ func (c *Client) DomainList(start int) ([]Domain, error) {
 	if err != nil {
 		return nil, err
 	}
-	return resp.Domains, nil
+	domains := make([]Domain, len(resp.Domains))
+	for i, d := range resp.Domains {
+		domains[i] = d.toDomain()
+	}
+	return domains, nil
 }
 
 func (c *Client) DomainGet(domain string) (*Domain, error) {
@@ -76,17 +94,8 @@ func (c *Client) DomainGet(domain string) (*Domain, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Domain{
-		Domain:       resp.Domain.Domain,
-		Status:       resp.Domain.Status,
-		TLD:          resp.Domain.TLD,
-		CreateDate:   resp.Domain.CreateDate,
-		ExpireDate:   resp.Domain.ExpireDate,
-		SecurityLock: string(resp.Domain.SecurityLock),
-		WhoisPrivacy: string(resp.Domain.WhoisPrivacy),
-		AutoRenew:    string(resp.Domain.AutoRenew),
-		NotLocal:     resp.Domain.NotLocal,
-	}, nil
+	d := resp.Domain.toDomain()
+	return &d, nil
 }
 
 func (c *Client) DomainUpdateNameservers(domain string, nameservers []string) error {
